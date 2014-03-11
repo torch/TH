@@ -48,9 +48,21 @@ TH_API void THError(const char *fmt, ...);
 TH_API void THSetErrorHandler( void (*torchErrorHandlerFunction)(const char *msg, void *data), void *data );
 TH_API void THArgCheck(int condition, int argNumber, const char *msg);
 TH_API void THSetArgErrorHandler( void (*torchArgErrorHandlerFunction)(int argNumber, const char *msg, void *data), void *data );
+
 TH_API void* THAlloc(long size);
 TH_API void* THRealloc(void *ptr, long size);
 TH_API void THFree(void *ptr);
+
+/* Custom allocator. malloc and realloc raise an error (using THError) on
+ * allocation failure.
+ */
+typedef struct THAllocator {
+  void* (*malloc)(void*, long);
+  void* (*realloc)(void*, void*, long);
+  void (*free)(void*, void*);
+} THAllocator;
+
+extern THAllocator THDefaultAllocator;
 
 #define TH_CONCAT_STRING_2(x,y) TH_CONCAT_STRING_2_EXPAND(x,y)
 #define TH_CONCAT_STRING_2_EXPAND(x,y) #x #y
