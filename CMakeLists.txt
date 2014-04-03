@@ -1,4 +1,14 @@
+cmake_minimum_required(VERSION 2.6)
+
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
+# Can be compiled without being a torch sub-project
+IF(NOT Torch_INSTALL_BIN_SUBDIR)
+  SET(Torch_INSTALL_BIN_SUBDIR "bin")
+  SET(Torch_INSTALL_LIB_SUBDIR "lib")
+  SET(Torch_INSTALL_INCLUDE_SUBDIR "include")
+  SET(Torch_INSTALL_CMAKE_SUBDIR "share/cmake/torch")
+ENDIF()
 
 # flags
 
