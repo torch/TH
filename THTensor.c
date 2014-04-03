@@ -14,6 +14,9 @@
 #include "generic/THTensorCopy.c"
 #include "THGenerateAllTypes.h"
 
+#include "generic/THTensorFunctor.c"
+#include "THGenerateAllTypes.h"
+
 #include "generic/THTensorRandom.c"
 #include "THGenerateAllTypes.h"
 

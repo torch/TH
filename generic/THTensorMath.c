@@ -206,13 +206,15 @@ real THTensor_(maxall)(THTensor *tensor)
 accreal THTensor_(sumall)(THTensor *tensor)
 {
   accreal sum = 0;
-  TH_TENSOR_APPLY(real, tensor, sum += *tensor_data;);
+  THTensor_(apply)(tensor, THTensor_(sum_functor), &sum);
   return sum;
 }
 
 void THTensor_(add)(THTensor *r_, THTensor *t, real value)
 {
   THTensor_(resizeAs)(r_, t);
+  THTensor_(apply2)(t, r_, THTensor_(add_functor), &value);
+  /*
   if (THTensor_(isContiguous)(r_) && THTensor_(isContiguous)(t) && THTensor_(nElement)(r_) == THTensor_(nElement)(t)) {
       real *tp = THTensor_(data)(t);
       real *rp = THTensor_(data)(r_);
@@ -224,6 +226,7 @@ void THTensor_(add)(THTensor *r_, THTensor *t, real value)
   } else {
       TH_TENSOR_APPLY2(real, r_, real, t, *r__data = *t_data + value;);
   }
+  */
 }
 
 void THTensor_(mul)(THTensor *r_, THTensor *t, real value)

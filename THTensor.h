@@ -19,6 +19,10 @@
 
 #include "THTensorMacros.h"
 
+/* functors */
+#include "generic/THTensorFunctor.h"
+#include "THGenerateAllTypes.h"
+
 /* random numbers */
 #include "THRandom.h"
 #include "generic/THTensorRandom.h"
