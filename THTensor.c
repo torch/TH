@@ -8,6 +8,9 @@
 #include "generic/THTensor.c"
 #include "THGenerateAllTypes.h"
 
+#include "generic/THTensorApply.c"
+#include "THGenerateAllTypes.h"
+
 #include "generic/THTensorCopy.c"
 #include "THGenerateAllTypes.h"
 
