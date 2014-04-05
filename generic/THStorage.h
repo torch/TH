@@ -18,8 +18,7 @@
 
 #define TH_STORAGE_REFCOUNTED 1
 #define TH_STORAGE_RESIZABLE  2
-#define TH_STORAGE_MAPPED     4
-#define TH_STORAGE_FREEMEM    8
+#define TH_STORAGE_FREEMEM    4
 
 typedef struct THStorage
 {
@@ -44,7 +43,8 @@ TH_API THStorage* THStorage_(newWithSize1)(real);
 TH_API THStorage* THStorage_(newWithSize2)(real, real);
 TH_API THStorage* THStorage_(newWithSize3)(real, real, real);
 TH_API THStorage* THStorage_(newWithSize4)(real, real, real, real);
-TH_API THStorage* THStorage_(newWithMapping)(const char *fileName, int isShared);
+TH_API THStorage* THStorage_(newWithMapping)(const char *filename, long size, int shared);
+
 /* takes ownership of data */
 TH_API THStorage* THStorage_(newWithData)(real *data, long size);
 

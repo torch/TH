@@ -106,24 +106,6 @@ void THFree(void *ptr)
   free(ptr);
 }
 
-static void *allocatorAlloc(void* ctx, long size) {
-  return THAlloc(size);
-}
-
-static void *allocatorRealloc(void* ctx, void* ptr, long size) {
-  return THRealloc(ptr, size);
-}
-
-static void allocatorFree(void* ctx, void* ptr) {
-  THFree(ptr);
-}
-
-THAllocator THDefaultAllocator = {
-  &allocatorAlloc,
-  &allocatorRealloc,
-  &allocatorFree,
-};
-
 double THLog1p(const double x)
 {
 #ifdef _MSC_VER
@@ -133,4 +115,3 @@ double THLog1p(const double x)
   return log1p(x);
 #endif
 }
-
