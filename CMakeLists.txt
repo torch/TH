@@ -12,6 +12,11 @@ ENDIF()
 
 # flags
 
+IF(MSVC)
+  # respect the standard
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE=1)
+ENDIF(MSVC)
+
 # OpenMP support?
 SET(WITH_OPENMP ON CACHE BOOL "OpenMP support if available?")
 IF (APPLE AND CMAKE_COMPILER_IS_GNUCC)
