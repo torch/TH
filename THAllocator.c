@@ -36,14 +36,13 @@ THAllocator THDefaultAllocator = {
 
 struct THMapAllocatorContext_ {
   char *filename; /* file name */
-  int shared; /* is shared or not  */
+  int shared; /* is shared or not */
   long size; /* mapped size */
 };
 
 THMapAllocatorContext *THMapAllocatorContext_new(const char *filename, int shared)
 {
   THMapAllocatorContext *ctx = THAlloc(sizeof(THMapAllocatorContext));
-  FILE *f;
 
   ctx->filename = THAlloc(strlen(filename)+1);
   strcpy(ctx->filename, filename);
@@ -74,6 +73,7 @@ static void *THMapAllocator_alloc(void* ctx_, long size)
     HANDLE hfile;
     HANDLE hmfile;
     DWORD size_hi, size_lo;
+    size_t hfilesz;
 
     /* open file */
     /* FILE_FLAG_RANDOM_ACCESS ? */
@@ -90,35 +90,48 @@ static void *THMapAllocator_alloc(void* ctx_, long size)
         THError("could not open file <%s> in read-only mode", ctx->filename);
     }
 
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa365541(v=vs.85).aspx
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa365531(v=vs.85).aspx
+    size_lo = GetFileSize(hfile, &size_hi);
+    if(sizeof(size_t) > 4)
+    {
+      hfilesz = ((size_t)size_hi) << 32;
+      hfilesz |= size_lo;
+    }
+    else
+      hfilesz = (size_t)(size_lo);
 
     if(size > 0)
     {
-      if(size > fdsz)
+      if(size > hfilesz)
       {
         if(ctx->shared)
         {
-          if((fdsz = lseek(fd, size-1, SEEK_SET)) == -1)
+#if SIZEOF_SIZE_T > 4
+          size_hi = (DWORD)((size) >> 32);
+          size_lo = (DWORD)((size) & 0xFFFFFFFF);
+#else
+          size_hi = 0;
+          size_lo = (DWORD)(size);
+#endif
+          if((SetFilePointer(hfile, size_lo, &size_hi, FILE_BEGIN)) == INVALID_SET_FILE_POINTER)
           {
-            close(fd);
+            CloseHandle(hfile);
             THError("unable to stretch file <%s> to the right size", ctx->filename);
           }
-          if((write(fd, "", 1)) != 1) /* note that the string "" contains the '\0' byte ... */
+          if(SetEndOfFile(hfile) == 0)
           {
-            close(fd);
+            CloseHandle(hfile);
             THError("unable to write to file <%s>", ctx->filename);
           }
         }
         else
         {
-          close(fd);
+          CloseHandle(hfile);
           THError("file <%s> size is smaller than the required mapping size <%ld>", ctx->filename, size);
         }
       }
     }
     else
-      size = fdsz;
+      size = hfilesz;
 
     ctx->size = size; /* if we are here, it must be the right size */
 
