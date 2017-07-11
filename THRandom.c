@@ -241,6 +241,31 @@ double THRandom_normal(THGenerator *_generator, double mean, double stdv)
     return _generator->normal_rho*sin(2.*M_PI*_generator->normal_x)*stdv+mean;
 }
 
+double THRandom_normal_truncated(THGenerator *_generator, double mean, double stdv)
+{
+  THArgCheck(stdv > 0, 2, "standard deviation must be strictly positive");
+
+  /* Using Box-Muller for truncated normal sampling
+  between -2*std and 2*std.
+  (based on  Martino, L.; Luengo, D.; Míguez, J. 
+  "Efficient sampling from truncated bivariate Gaussians 
+  via Box-Muller transformation")*/
+  if(!_generator->normal_is_valid)
+  {
+    _generator->normal_x = __uniform__(_generator);
+    _generator->normal_y = __uniform__(_generator, 0, 1-exp(-2));
+    _generator->normal_rho = sqrt(-2. * log(1.0-_generator->normal_y));
+    _generator->normal_is_valid = 1;
+  }
+  else
+    _generator->normal_is_valid = 0;
+
+  if(_generator->normal_is_valid)
+    return _generator->normal_rho*cos(2.*M_PI*_generator->normal_x)*stdv+mean;
+  else
+    return _generator->normal_rho*sin(2.*M_PI*_generator->normal_x)*stdv+mean;
+}
+
 double THRandom_exponential(THGenerator *_generator, double lambda)
 {
   return(-1. / lambda * log(1-__uniform__(_generator)));
